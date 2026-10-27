@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load core_tags %}
+{% block title %}Notifications{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Notifications</h1><p>{% if unread_notifications %}You have {{ unread_notifications }} unread notification{{ unread_notifications|pluralize }}.{% else %}You're all caught up ✨{% endif %}</p></div>
+  <div class="row">
+    {% if unread_notifications %}<form method="post" action="{% url 'mark_all_read' %}">{% csrf_token %}<button class="btn btn-soft btn-sm" type="submit"><i class="bi bi-check2-all"></i> Mark all as read</button></form>{% endif %}
+    <details class="dropdown"><summary class="btn btn-ghost btn-icon btn-sm" aria-label="More"><i class="bi bi-three-dots-vertical"></i></summary>
+      <div class="dropdown-menu">
+        <a href="{% url 'settings_notifications' %}"><i class="bi bi-sliders"></i> Preferences</a>
+        <form method="post" action="{% url 'clear_notifications' %}" data-confirm="Delete all read notifications?">{% csrf_token %}<button class="danger" type="submit"><i class="bi bi-trash"></i> Clear read</button></form>
+      </div></details>
+  </div>
+</div>
+
+<div class="tabs mb-2">
+  <a href="?tab=all" class="{% if tab == 'all' %}active{% endif %}">All</a>
+  <a href="?tab=unread" class="{% if tab == 'unread' %}active{% endif %}">Unread</a>
+  <a href="?tab=requests" class="{% if tab == 'requests' %}active{% endif %}">Connections</a>
+</div>
+
+{% for title, items in groups %}
+  <div class="group-title">{{ title }}</div>
+  <div class="card" style="padding:6px">
+    {% for n in items %}
+    <a class="notif {% if not n.is_read %}unread{% endif %}" href="{% url 'open_notification' n.pk %}">
+      <span class="ic-wrap">
+        {% if n.actor %}{% avatar n.actor 46 %}<span class="type-ic {{ n.type }}"><i class="bi {{ n.icon }}"></i></span>
+        {% else %}<span class="sys-ic"><i class="bi {{ n.icon }}"></i></span>{% endif %}
+      </span>
+      <span class="grow" style="min-width:0">
+        <div class="title">{{ n.title }}</div>
+        {% if n.body %}<div class="body">{{ n.body }}</div>{% endif %}
+        <div class="time">{{ n.created_at|ago }}</div>
+      </span>
+    </a>
+    {% endfor %}
+  </div>
+{% endfor %}
+
+{% if empty %}
+<div class="card empty mt-2"><div class="empty-icon"><i class="bi bi-bell-slash"></i></div>
+  <h3>No notifications {% if tab == 'unread' %}unread{% endif %}</h3><p>Connection requests, messages, likes and event reminders will appear here.</p></div>
+{% endif %}
+{% endblock %}

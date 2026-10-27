@@ -1,0 +1,42 @@
+{% extends "base_page.html" %}
+{% block title %}Complete your profile{% endblock %}
+{% block body %}
+<div class="setup">
+  <div class="wrapper">
+    <div class="row-between">
+      <span class="brand">{% include "partials/logo.html" with size=34 %} Connectera</span>
+      <span class="subtle bold">Step 1 of 2</span>
+    </div>
+    <div class="steps"><span class="on"></span><span></span></div>
+    <h1>Complete your profile 🎓</h1>
+    <p class="muted mt-1 mb-3">Help other students find you. You can change all of this later.</p>
+
+    <form method="post" enctype="multipart/form-data" class="card" novalidate>
+      {% csrf_token %}
+      <div class="avatar-upload">
+        <div class="preview" id="avatar-preview">{% if user.avatar %}<img src="{{ user.avatar.url }}" alt="">{% else %}<i class="bi bi-camera"></i>{% endif %}</div>
+        <div>
+          <b>Profile photo</b>
+          <p class="subtle mb-1">JPG, PNG or WEBP · max 5 MB</p>
+          <span class="btn btn-soft btn-sm file-btn"><i class="bi bi-upload"></i> Upload photo
+            <input type="file" name="avatar" accept="image/*" data-preview="#avatar-preview"></span>
+          {% for e in form.avatar.errors %}<p class="error">{{ e }}</p>{% endfor %}
+        </div>
+      </div>
+      {% include "partials/field.html" with field=form.full_name %}
+      {% include "partials/field.html" with field=form.headline %}
+      <div class="grid-2">
+        {% include "partials/field.html" with field=form.country %}
+        {% include "partials/field.html" with field=form.destination_country %}
+        {% include "partials/field.html" with field=form.university %}
+        {% include "partials/field.html" with field=form.course %}
+      </div>
+      {% include "partials/field.html" with field=form.year %}
+      {% include "partials/field.html" with field=form.bio %}
+      <datalist id="universities">{% for u in universities %}<option value="{{ u }}">{% endfor %}</datalist>
+      <datalist id="courses">{% for c in courses %}<option value="{{ c }}">{% endfor %}</datalist>
+      <button class="btn btn-primary btn-lg btn-block" type="submit">Continue <i class="bi bi-arrow-right"></i></button>
+    </form>
+  </div>
+</div>
+{% endblock %}

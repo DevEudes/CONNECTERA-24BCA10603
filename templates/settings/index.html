@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load core_tags %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Settings</h1></div>
+
+<a href="{% url 'my_profile' %}" class="card card-soft row mb-3" style="color:var(--text)">
+  {% avatar user 60 ring=True %}
+  <div class="grow"><h3>{{ user.full_name }}</h3><p class="subtle">{{ user.email }}</p></div>
+  <i class="bi bi-chevron-right subtle"></i>
+</a>
+
+<div class="group-title">Account</div>
+<div class="card settings-list" style="padding:4px 16px">
+  <a href="{% url 'settings_account' %}"><span class="ic"><i class="bi bi-person-gear"></i></span><span>Account<span class="sub">Name, e-mail, password</span></span><i class="bi bi-chevron-right chev"></i></a>
+  <a href="{% url 'edit_profile' %}"><span class="ic pink"><i class="bi bi-mortarboard"></i></span><span>Academic profile<span class="sub">University, course, interests</span></span><i class="bi bi-chevron-right chev"></i></a>
+  <a href="{% url 'settings_privacy' %}"><span class="ic green"><i class="bi bi-shield-lock"></i></span><span>Privacy &amp; Security<span class="sub">Profile visibility, messages, account</span></span><i class="bi bi-chevron-right chev"></i></a>
+  <a href="{% url 'settings_blocked' %}"><span class="ic red"><i class="bi bi-slash-circle"></i></span><span>Blocked users</span><i class="bi bi-chevron-right chev"></i></a>
+</div>
+
+<div class="group-title">Preferences</div>
+<div class="card settings-list" style="padding:4px 16px">
+  <a href="{% url 'settings_notifications' %}"><span class="ic orange"><i class="bi bi-bell"></i></span><span>Notifications</span><i class="bi bi-chevron-right chev"></i></a>
+  <a href="{% url 'settings_appearance' %}"><span class="ic blue"><i class="bi bi-palette"></i></span><span>Appearance &amp; language<span class="sub">{{ user.get_theme_display }} · {{ user.get_language_display }}</span></span><i class="bi bi-chevron-right chev"></i></a>
+</div>
+
+<div class="group-title">Support</div>
+<div class="card settings-list" style="padding:4px 16px">
+  <a href="{% url 'settings_help' %}"><span class="ic"><i class="bi bi-question-circle"></i></span><span>Help &amp; Support</span><i class="bi bi-chevron-right chev"></i></a>
+  {% if user.is_staff %}<a href="/admin/"><span class="ic gray"><i class="bi bi-speedometer2"></i></span><span>Admin dashboard</span><i class="bi bi-chevron-right chev"></i></a>{% endif %}
+  <a href="{% url 'logout' %}"><span class="ic red"><i class="bi bi-box-arrow-right"></i></span><span style="color:var(--danger)">Log out</span></a>
+</div>
+<p class="subtle center mt-3">Connectera v1.0 · Connect • Share • Grow</p>
+{% endblock %}

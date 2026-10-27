@@ -1,0 +1,15 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+.env
+db.sqlite3
+media/
+staticfiles/
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/extensions.json
+!.vscode/settings.json

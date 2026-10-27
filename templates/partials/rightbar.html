@@ -1,0 +1,47 @@
+{% load core_tags %}
+<aside class="rightbar" aria-label="Recommendations">
+  {% if suggestions %}
+  <div class="card">
+    <div class="card-title"><h3>People you may know</h3><a href="{% url 'search' %}">See all</a></div>
+    {% for p in suggestions %}
+    <div class="suggestion">
+      <a href="{{ p.get_absolute_url }}">{% avatar p 42 online=True %}</a>
+      <div class="grow" style="min-width:0">
+        <a class="name truncate" href="{{ p.get_absolute_url }}">{{ p.full_name }}</a>
+        <span class="meta truncate" style="display:block">{{ p.match_reasons|join:" · "|default:p.university }}</span>
+      </div>
+      <form method="post" action="{% url 'send_request' p.pk %}" data-connect>{% csrf_token %}
+        <button class="btn btn-soft btn-icon btn-sm" type="submit" aria-label="Connect with {{ p.full_name }}"><i class="bi bi-person-plus"></i></button></form>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if events %}
+  <div class="card">
+    <div class="card-title"><h3>Upcoming events</h3><a href="{% url 'events' %}">See all</a></div>
+    {% for e in events %}
+    <a class="mini-event" href="{{ e.get_absolute_url }}">
+      <div class="date-badge"><div class="m">{{ e.starts_at|date:"M" }}</div><div class="d">{{ e.starts_at|date:"d" }}</div></div>
+      <div class="grow" style="min-width:0"><b class="truncate" style="display:block;font-size:.88rem">{{ e.title }}</b>
+        <span class="subtle">{{ e.starts_at|date:"D, H:i" }} · {{ e.going }} going</span></div>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if communities %}
+  <div class="card">
+    <div class="card-title"><h3>Communities for you</h3><a href="{% url 'communities' %}">See all</a></div>
+    {% for c in communities %}
+    <div class="suggestion">
+      <span class="avatar" style="width:42px;height:42px;border-radius:14px;font-size:1.3rem;background:var(--primary-50)">{{ c.icon }}</span>
+      <div class="grow" style="min-width:0"><a class="name truncate" href="{{ c.get_absolute_url }}">{{ c.name }}</a><span class="meta">{{ c.member_total }} members</span></div>
+      <form method="post" action="{% url 'toggle_membership' c.slug %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button class="btn btn-soft btn-sm" type="submit">Join</button></form>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  <p class="subtle center mt-2">Connectera © 2026 · <a href="{% url 'settings_help' %}">Help</a> · <a href="{% url 'settings_privacy' %}">Privacy</a></p>
+</aside>

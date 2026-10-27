@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load core_tags %}
+{% block title %}{{ event.title }}{% endblock %}
+{% block content %}
+<a href="{% url 'events' %}" class="back-link"><i class="bi bi-arrow-left"></i> Events</a>
+
+<section class="hero">
+  {% if event.image %}<img src="{{ event.image.url }}" alt="">{% endif %}
+  <div class="content">
+    <span class="tag">{{ event.get_category_display }}{% if event.is_past %} · Ended{% endif %}</span>
+    <h1 class="mt-1">{{ event.title }}</h1>
+    {% if event.community %}<p class="mt-1"><a href="{{ event.community.get_absolute_url }}" style="color:#fff;opacity:.9">{{ event.community.icon }} {{ event.community.name }}</a></p>{% endif %}
+  </div>
+</section>
+
+<div class="info-grid mt-3">
+  <div class="info-tile"><span class="ic"><i class="bi bi-calendar3"></i></span><div><b>{{ event.starts_at|date:"l d F Y" }}</b><span>Date</span></div></div>
+  <div class="info-tile"><span class="ic"><i class="bi bi-clock"></i></span><div><b>{{ event.starts_at|date:"H:i" }}{% if event.ends_at %} – {{ event.ends_at|date:"H:i" }}{% endif %}</b><span>Time</span></div></div>
+  <div class="info-tile"><span class="ic"><i class="bi {% if event.is_online %}bi-camera-video{% else %}bi-geo-alt{% endif %}"></i></span><div><b>{{ event.location }}</b><span>{% if event.is_online %}Online event{% else %}Location{% endif %}</span></div></div>
+  <div class="info-tile"><span class="ic"><i class="bi bi-ticket-perforated"></i></span><div><b>{% if event.capacity %}{{ event.spots_left }} spot{{ event.spots_left|pluralize }} left{% else %}Unlimited spots{% endif %}</b><span>Free · {{ participant_total }} registered</span></div></div>
+</div>
+
+{% if event.capacity %}
+<div class="card mt-3">
+  <div class="row-between small mb-1"><b>{{ participant_total }} / {{ event.capacity }} registered</b><span class="subtle">{% widthratio participant_total event.capacity 100 %}%</span></div>
+  <div class="progress"><span style="width:{% widthratio participant_total event.capacity 100 %}%"></span></div>
+</div>
+{% endif %}
+
+<div class="card mt-3">
+  <h3 class="mb-1">About this event</h3>
+  <p class="muted" style="white-space:pre-line">{{ event.description }}</p>
+</div>
+
+{% if event.organizer %}
+<div class="card mt-3">
+  <div class="card-title"><h3>Organizer</h3></div>
+  <div class="row">{% avatar event.organizer 50 %}
+    <div class="grow"><a href="{{ event.organizer.get_absolute_url }}" class="bold" style="color:var(--text)">{{ event.organizer.full_name }}</a>
+      <div class="subtle">{{ event.organizer.course }} · {{ event.organizer.university }}</div></div>
+    {% if event.organizer != user %}<a href="{% url 'start_chat' event.organizer.pk %}" class="btn btn-soft btn-sm"><i class="bi bi-chat-dots"></i> Contact</a>{% endif %}
+  </div>
+</div>
+{% endif %}
+
+<div class="card mt-3">
+  <div class="card-title"><h3>Who's going</h3><span class="subtle">{{ participant_total }}</span></div>
+  {% if friends_going %}<p class="small mb-2"><i class="bi bi-heart-fill" style="color:var(--pink)"></i> {% for f in friends_going %}<b>{{ f.first_name_display }}</b>{% if not forloop.last %}, {% endif %}{% endfor %} from your network {{ friends_going|length|pluralize:"is,are" }} going</p>{% endif %}
+  <div class="row wrap">{% for p in participants %}<a href="{{ p.get_absolute_url }}" title="{{ p.full_name }}">{% avatar p 42 %}</a>{% empty %}<span class="subtle">Be the first to register!</span>{% endfor %}</div>
+</div>
+
+<div class="card mt-3 sticky-cta row-between">
+  <div><b>{% if is_registered %}You're going! 🎟️{% elif event.is_past %}This event has ended{% elif event.is_full %}Event full{% else %}Free event{% endif %}</b>
+    <div class="subtle">{{ event.starts_at|date:"D d M · H:i" }}</div></div>
+  {% if not event.is_past %}
+  <form method="post" action="{% url 'toggle_registration' event.pk %}" {% if is_registered %}data-confirm="Cancel your registration?"{% endif %}>{% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.path }}">
+    {% if is_registered %}<button class="btn btn-outline btn-lg" type="submit">Cancel registration</button>
+    {% elif event.is_full %}<button class="btn btn-soft btn-lg" disabled>Full</button>
+    {% else %}<button class="btn btn-primary btn-lg" type="submit"><i class="bi bi-ticket-perforated"></i> Register</button>{% endif %}
+  </form>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Notification settings{% endblock %}
+{% block content %}
+<a href="{% url 'settings' %}" class="back-link"><i class="bi bi-arrow-left"></i> Settings</a>
+<div class="page-head"><div><h1>Notifications</h1><p>Choose what you want to be notified about.</p></div></div>
+<form method="post" class="card">
+  {% csrf_token %}
+  {% for f in form %}
+  <label class="switch"><span><b>{{ f.label }}</b></span>{{ f }}</label>
+  {% endfor %}
+  <button class="btn btn-primary mt-2" type="submit">Save preferences</button>
+</form>
+{% endblock %}

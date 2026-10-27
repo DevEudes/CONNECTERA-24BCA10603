@@ -1,0 +1,21 @@
+{% extends "auth/base_auth.html" %}
+{% block title %}Create account{% endblock %}
+{% block art_title %}Your campus, your people — all in one place.{% endblock %}
+{% block form %}
+<h1>Create your account ✨</h1>
+<p class="lead">Join thousands of students who connect, share and grow together.</p>
+<form method="post" novalidate>
+  {% csrf_token %}
+  {% for e in form.non_field_errors %}<p class="error mb-2">{{ e }}</p>{% endfor %}
+  {% include "partials/field.html" with field=form.full_name icon="person" %}
+  {% include "partials/field.html" with field=form.email icon="envelope" %}
+  {% include "partials/field.html" with field=form.password icon="lock" password=True %}
+  {% include "partials/field.html" with field=form.password2 icon="shield-lock" password=True %}
+  <div class="field{% if form.terms.errors %} has-error{% endif %}">
+    <label class="check">{{ form.terms }} <span>I agree to the <a href="{% url 'landing' %}">Terms</a> &amp; <a href="{% url 'landing' %}">Privacy Policy</a></span></label>
+    {% for e in form.terms.errors %}<p class="error">{{ e }}</p>{% endfor %}
+  </div>
+  <button class="btn btn-primary btn-lg btn-block" type="submit">Create account <i class="bi bi-arrow-right"></i></button>
+</form>
+<p class="alt-link">Already have an account? <a href="{% url 'login' %}">Sign in</a></p>
+{% endblock %}

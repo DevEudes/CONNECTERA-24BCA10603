@@ -1,0 +1,28 @@
+{% extends "base_page.html" %}
+{% block body %}
+<div class="auth">
+  <section class="auth-art" aria-hidden="true">
+    <span class="blob" style="width:340px;height:340px;right:-120px;top:-100px"></span>
+    <span class="blob" style="width:220px;height:220px;left:-80px;bottom:60px"></span>
+    <a href="{% url 'landing' %}" class="brand">{% include "partials/logo.html" with size=42 light=True %} Connectera</a>
+    <div class="float-cards">
+      <div class="float-card" style="left:4%;top:6%"><span class="ic">🎓</span><div><b>Aisha · Chandigarh University</b><span>wants to connect with you</span></div></div>
+      <div class="float-card" style="right:2%;top:38%;animation-delay:-2s"><span class="ic" style="background:#fce7f3;color:#db2777"><i class="bi bi-heart-fill"></i></span><div><b>128 students</b><span>liked your hackathon post</span></div></div>
+      <div class="float-card" style="left:12%;bottom:4%;animation-delay:-4s"><span class="ic" style="background:#fef3c7">📅</span><div><b>International Food Fest</b><span>Saturday · 54 going</span></div></div>
+    </div>
+    <div>
+      <h2>{% block art_title %}Connect, share &amp; grow with students worldwide.{% endblock %}</h2>
+      <p>{% block art_text %}Find classmates who share your passions, join communities, discover campus events and build friendships that last.{% endblock %}</p>
+    </div>
+  </section>
+  <section class="auth-form">
+    <div class="inner">
+      <div class="auth-mobile-head">
+        <span class="blob" style="width:160px;height:160px;right:-40px;top:-60px"></span>
+        <a href="{% url 'landing' %}" class="brand">{% include "partials/logo.html" with size=40 light=True %} Connectera</a>
+      </div>
+      {% block form %}{% endblock %}
+    </div>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Discover students{% endblock %}
+{% block app_class %}main-wide{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Discover students</h1><p>Find classmates by name, university, course or interest.</p></div>
+  <a href="{% url 'connections' %}" class="btn btn-outline"><i class="bi bi-people"></i> My connections</a></div>
+
+<form method="get" class="card mb-3">
+  <div class="row">
+    <div class="searchbar grow"><i class="bi bi-search"></i>
+      <input type="search" name="q" value="{{ q }}" placeholder="Search students, universities, courses…" aria-label="Search"></div>
+    <button class="btn btn-primary" type="submit">Search</button>
+  </div>
+  <div class="filters mt-2">
+    <select name="university" aria-label="University" onchange="this.form.submit()"><option value="">🎓 All universities</option>
+      {% for u in universities %}<option {% if filters.university == u %}selected{% endif %}>{{ u }}</option>{% endfor %}</select>
+    <select name="course" aria-label="Course" onchange="this.form.submit()"><option value="">📚 All courses</option>
+      {% for c in courses %}<option {% if filters.course == c %}selected{% endif %}>{{ c }}</option>{% endfor %}</select>
+    <select name="interest" aria-label="Interest" onchange="this.form.submit()"><option value="">✨ All interests</option>
+      {% for i in interests %}<option value="{{ i.pk }}" {% if filters.interest == i.pk|stringformat:"s" %}selected{% endif %}>{{ i.icon }} {{ i.name }}</option>{% endfor %}</select>
+    <select name="country" aria-label="Country" onchange="this.form.submit()"><option value="">🌍 All countries</option>
+      {% for c in countries %}<option {% if filters.country == c %}selected{% endif %}>{{ c }}</option>{% endfor %}</select>
+    <select name="year" aria-label="Year" onchange="this.form.submit()"><option value="">📅 Any year</option>
+      {% for v, l in years %}<option value="{{ v }}" {% if filters.year == v|stringformat:"s" %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>
+  </div>
+  {% if searching %}<div class="mt-2"><a href="{% url 'search' %}" class="small bold"><i class="bi bi-x-circle"></i> Clear filters</a></div>{% endif %}
+</form>
+
+{% if suggestions %}
+<div class="row-between mb-2"><h2>Recommended for you <span class="text-grad">✦</span></h2></div>
+<p class="muted mb-2">Based on your university, course, country and interests.</p>
+<div class="people-grid three mb-3">{% for p in suggestions %}{% include "partials/person_card.html" %}{% endfor %}</div>
+<h2 class="mt-4 mb-2">All students</h2>
+{% else %}
+<p class="muted mb-2"><b>{{ page.paginator.count }}</b> student{{ page.paginator.count|pluralize }} found</p>
+{% endif %}
+
+<div class="people-grid three">
+  {% for p in page %}{% include "partials/person_card.html" %}{% empty %}
+  <div class="card empty" style="grid-column:1/-1"><div class="empty-icon"><i class="bi bi-search"></i></div>
+    <h3>No students found</h3><p>Try another name or remove some filters.</p><a class="btn btn-soft" href="{% url 'search' %}">Reset search</a></div>
+  {% endfor %}
+</div>
+
+{% if page.paginator.num_pages > 1 %}
+<nav class="pagination" aria-label="Pages">
+  {% if page.has_previous %}<a href="?{{ query_string }}&page={{ page.previous_page_number }}"><i class="bi bi-chevron-left"></i></a>{% endif %}
+  {% for n in page.paginator.page_range %}
+    {% if n == page.number %}<span class="current">{{ n }}</span>{% elif n > page.number|add:-3 and n < page.number|add:3 %}<a href="?{{ query_string }}&page={{ n }}">{{ n }}</a>{% endif %}
+  {% endfor %}
+  {% if page.has_next %}<a href="?{{ query_string }}&page={{ page.next_page_number }}"><i class="bi bi-chevron-right"></i></a>{% endif %}
+</nav>
+{% endif %}
+{% endblock %}

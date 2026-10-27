@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Appearance{% endblock %}
+{% block content %}
+<a href="{% url 'settings' %}" class="back-link"><i class="bi bi-arrow-left"></i> Settings</a>
+<div class="page-head"><div><h1>Appearance &amp; language</h1><p>Make Connectera feel like yours.</p></div></div>
+<form method="post" class="card">
+  {% csrf_token %}
+  <div class="field"><span class="label">Theme</span>
+    <div class="radio-cards" style="grid-template-columns:1fr 1fr">
+      {% for r in form.theme %}<label>{{ r.tag }} {% if r.data.value == 'dark' %}🌙{% else %}☀️{% endif %} {{ r.choice_label }}</label>{% endfor %}
+    </div></div>
+  {% include "partials/field.html" with field=form.language %}
+  <p class="subtle mb-2"><i class="bi bi-info-circle"></i> The interface is currently available in English; more languages are coming.</p>
+  <button class="btn btn-primary" type="submit">Save</button>
+</form>
+{% endblock %}

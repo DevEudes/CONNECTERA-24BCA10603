@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load core_tags %}
+{% block title %}Connections{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>My network</h1><p>Manage your connections and requests.</p></div>
+  <a href="{% url 'search' %}" class="btn btn-primary"><i class="bi bi-person-plus"></i> Find students</a></div>
+
+<div class="tabs mb-3">
+  <a href="?tab=connections" class="{% if tab == 'connections' %}active{% endif %}">Connections · {{ people.count }}</a>
+  <a href="?tab=received" class="{% if tab == 'received' %}active{% endif %}">Requests{% if received %} <span class="badge">{{ received|length }}</span>{% endif %}</a>
+  <a href="?tab=sent" class="{% if tab == 'sent' %}active{% endif %}">Sent · {{ sent|length }}</a>
+</div>
+
+<div class="card">
+{% if tab == 'received' %}
+  {% for r in received %}
+  <div class="list-item" data-request-row>
+    <a href="{{ r.requester.get_absolute_url }}">{% avatar r.requester 52 online=True %}</a>
+    <div class="grow" style="min-width:0">
+      <a class="name" href="{{ r.requester.get_absolute_url }}">{{ r.requester.full_name }}</a>
+      <div class="meta truncate">{{ r.requester.course }} · {{ r.requester.university }}</div>
+      <div class="meta">{{ r.created_at|ago }}</div>
+    </div>
+    <form method="post" action="{% url 'respond_request' r.pk 'accept' %}" data-connect>{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <button class="btn btn-primary btn-sm" type="submit"><i class="bi bi-check2"></i> Accept</button></form>
+    <form method="post" action="{% url 'respond_request' r.pk 'decline' %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <button class="btn btn-outline btn-sm" type="submit">Decline</button></form>
+  </div>
+  {% empty %}
+  <div class="empty"><div class="empty-icon"><i class="bi bi-inbox"></i></div><h3>No pending requests</h3><p>When students want to connect with you, they'll appear here.</p></div>
+  {% endfor %}
+
+{% elif tab == 'sent' %}
+  {% for r in sent %}
+  <div class="list-item">
+    <a href="{{ r.receiver.get_absolute_url }}">{% avatar r.receiver 52 %}</a>
+    <div class="grow" style="min-width:0">
+      <a class="name" href="{{ r.receiver.get_absolute_url }}">{{ r.receiver.full_name }}</a>
+      <div class="meta truncate">{{ r.receiver.course }} · {{ r.receiver.university }}</div>
+      <div class="meta">Sent {{ r.created_at|ago }}</div>
+    </div>
+    <form method="post" action="{% url 'cancel_request' r.pk %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <button class="btn btn-outline btn-sm" type="submit">Cancel</button></form>
+  </div>
+  {% empty %}
+  <div class="empty"><div class="empty-icon"><i class="bi bi-send"></i></div><h3>No sent requests</h3><p>Discover students and send them a connection request.</p><a href="{% url 'search' %}" class="btn btn-soft">Discover</a></div>
+  {% endfor %}
+
+{% else %}
+  <form method="get" class="searchbar mb-2"><input type="hidden" name="tab" value="connections"><i class="bi bi-search"></i>
+    <input type="search" name="q" value="{{ q }}" placeholder="Search your connections…" aria-label="Search connections"></form>
+  {% for p in people %}
+  <div class="list-item">
+    <a href="{{ p.get_absolute_url }}">{% avatar p 52 online=True %}</a>
+    <div class="grow" style="min-width:0">
+      <a class="name" href="{{ p.get_absolute_url }}">{{ p.full_name }}</a>
+      <div class="meta truncate">{{ p.course }} · {{ p.university }}</div>
+    </div>
+    <a href="{% url 'start_chat' p.pk %}" class="btn btn-soft btn-icon btn-sm" aria-label="Message"><i class="bi bi-chat-dots"></i></a>
+    <details class="dropdown">
+      <summary class="btn btn-ghost btn-icon btn-sm" aria-label="More"><i class="bi bi-three-dots-vertical"></i></summary>
+      <div class="dropdown-menu">
+        <a href="{{ p.get_absolute_url }}"><i class="bi bi-person"></i> View profile</a>
+        <form method="post" action="{% url 'remove_connection' p.pk %}" data-confirm="Remove {{ p.full_name }}?">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button type="submit"><i class="bi bi-person-dash"></i> Remove</button></form>
+        <form method="post" action="{% url 'block_user' p.pk %}" data-confirm="Block {{ p.full_name }}?">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button class="danger" type="submit"><i class="bi bi-slash-circle"></i> Block</button></form>
+      </div>
+    </details>
+  </div>
+  {% empty %}
+  <div class="empty"><div class="empty-icon"><i class="bi bi-people"></i></div><h3>{% if q %}No match{% else %}No connections yet{% endif %}</h3>
+    <p>Start building your student network — it only takes one click.</p><a href="{% url 'search' %}" class="btn btn-primary">Discover students</a></div>
+  {% endfor %}
+{% endif %}
+</div>
+{% endblock %}

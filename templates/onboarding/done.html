@@ -1,0 +1,32 @@
+{% extends "base_page.html" %}
+{% load core_tags %}
+{% block title %}You're all set!{% endblock %}
+{% block body %}
+<div class="setup" data-confetti>
+  <div class="wrapper center" style="padding-top:40px">
+    <div class="success-burst"><div class="core"><i class="bi bi-check-lg"></i></div></div>
+    <h1 class="mt-3">Profile completed! 🎉</h1>
+    <p class="muted mt-1">Welcome to Connectera, {{ user.first_name_display }}. Your student journey starts now.</p>
+
+    <div class="card mt-3" style="text-align:left">
+      <div class="row">{% avatar user 64 ring=True %}
+        <div class="grow"><h3>{{ user.full_name }}</h3><p class="subtle">{{ user.course }} · {{ user.university }}</p>
+          <div class="chips mt-1">{% for i in user.interests.all|slice:":4" %}<span class="chip">{{ i.icon }} {{ i.name }}</span>{% endfor %}</div></div>
+      </div>
+    </div>
+
+    {% if suggestions %}
+    <div class="card mt-3" style="text-align:left">
+      <div class="card-title"><h3>Students you might like</h3><a href="{% url 'search' %}">See all</a></div>
+      {% for p in suggestions %}
+      <div class="suggestion">{% avatar p 44 %}
+        <div class="grow"><a class="name" href="{{ p.get_absolute_url }}">{{ p.full_name }}</a><span class="meta">{{ p.match_reasons|join:" · "|default:p.university }}</span></div>
+        <form method="post" action="{% url 'send_request' p.pk %}" data-connect>{% csrf_token %}<button class="btn btn-primary btn-sm"><i class="bi bi-person-plus"></i> Connect</button></form>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    <a href="{% url 'home' %}" class="btn btn-primary btn-lg btn-block mt-3">Go to my feed <i class="bi bi-arrow-right"></i></a>
+  </div>
+</div>
+{% endblock %}

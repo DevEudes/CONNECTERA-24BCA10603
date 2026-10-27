@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Help & Support{% endblock %}
+{% block content %}
+<a href="{% url 'settings' %}" class="back-link"><i class="bi bi-arrow-left"></i> Settings</a>
+<div class="card card-grad mb-3">
+  <h1 style="color:#fff">How can we help? 💜</h1>
+  <p style="opacity:.9" class="mt-1">Browse the FAQ or send a message to the Connectera team.</p>
+</div>
+<div class="card faq">
+  <h3 class="mb-1">Frequently asked questions</h3>
+  {% for q, a in faq %}<details><summary>{{ q }}</summary><p>{{ a }}</p></details>{% endfor %}
+</div>
+<form method="post" class="card" novalidate>
+  {% csrf_token %}
+  <h3 class="mb-2">Contact support</h3>
+  {% include "partials/field.html" with field=form.topic %}
+  {% include "partials/field.html" with field=form.message %}
+  <button class="btn btn-primary" type="submit"><i class="bi bi-send"></i> Send message</button>
+</form>
+{% endblock %}

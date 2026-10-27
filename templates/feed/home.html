@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load core_tags %}
+{% block title %}Home{% endblock %}
+{% block app_class %}with-right{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Hi {{ user.first_name_display }} 👋</h1><p>Here's what's happening on campus today.</p></div>
+  <a href="{% url 'notifications' %}" class="btn btn-outline btn-icon desktop-only" aria-label="Notifications" style="position:relative"><i class="bi bi-bell"></i>
+    {% if unread_notifications %}<span class="badge" style="position:absolute;top:-4px;right:-4px">{{ unread_notifications }}</span>{% endif %}</a>
+</div>
+
+{# Stories row: my connections #}
+<div class="stories">
+  <a class="story add" href="{% url 'create_post' %}"><span class="ring"><span class="add-icon"><i class="bi bi-plus-lg"></i></span></span><span class="n">Share</span></a>
+  {% for s in stories %}
+  <a class="story" href="{{ s.get_absolute_url }}"><span class="ring">{% avatar s 58 online=True %}</span><span class="n">{{ s.first_name_display }}</span></a>
+  {% empty %}
+  <a class="story" href="{% url 'search' %}"><span class="ring"><span class="add-icon"><i class="bi bi-search"></i></span></span><span class="n">Find people</span></a>
+  {% endfor %}
+</div>
+
+{# Composer #}
+<div class="card mb-3">
+  <div class="composer">
+    {% avatar user 44 %}
+    <a href="{% url 'create_post' %}" class="fake-input">What's on your mind, {{ user.first_name_display }}?</a>
+  </div>
+  <div class="composer-actions">
+    <a href="{% url 'create_post' %}"><i class="bi bi-image" style="color:#10b981"></i> Photo</a>
+    <a href="{% url 'create_event' %}"><i class="bi bi-calendar-event" style="color:#f59e0b"></i> Event</a>
+    <a href="{% url 'communities' %}"><i class="bi bi-collection" style="color:var(--primary)"></i> Community</a>
+  </div>
+</div>
+
+<div class="tabs mb-3">
+  <a href="?tab=for-you" class="{% if tab != 'network' %}active{% endif %}"><i class="bi bi-stars"></i> For you</a>
+  <a href="?tab=network" class="{% if tab == 'network' %}active{% endif %}"><i class="bi bi-people"></i> My network</a>
+</div>
+
+<div class="feed-list" id="feed-list">
+  {% include "feed/_post_list.html" %}
+</div>
+
+{% if not posts %}
+<div class="card empty">
+  <div class="empty-icon"><i class="bi bi-newspaper"></i></div>
+  <h3>Your feed is quiet</h3>
+  <p>{% if tab == 'network' %}Connect with more students to see their posts here.{% else %}Be the first to share something with your campus!{% endif %}</p>
+  <a href="{% if tab == 'network' %}{% url 'search' %}{% else %}{% url 'create_post' %}{% endif %}" class="btn btn-primary">{% if tab == 'network' %}Discover students{% else %}Create a post{% endif %}</a>
+</div>
+{% endif %}
+
+{% if posts.has_next %}
+<div class="center mt-3">
+  <button class="btn btn-outline" id="load-more" data-url="?tab={{ tab }}&page={{ posts.next_page_number }}">Load more posts</button>
+  <noscript><a class="btn btn-outline" href="?tab={{ tab }}&page={{ posts.next_page_number }}">Next page</a></noscript>
+</div>
+{% elif posts %}
+<p class="subtle center mt-3">You're all caught up ✨</p>
+{% endif %}
+{% endblock %}
+
+{% block rightbar %}{% include "partials/rightbar.html" %}{% endblock %}

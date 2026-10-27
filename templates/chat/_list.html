@@ -1,0 +1,24 @@
+{% load core_tags %}
+<div class="chat-list">
+  <div class="head">
+    <div class="row-between mb-2"><h2>Messages</h2>
+      <a href="{% url 'connections' %}" class="btn btn-soft btn-icon btn-sm" aria-label="New message"><i class="bi bi-pencil-square"></i></a></div>
+    <form method="get" class="searchbar"><i class="bi bi-search"></i>
+      <input type="search" name="q" value="{{ q }}" placeholder="Search conversations…" aria-label="Search conversations"></form>
+  </div>
+  <div class="items">
+    {% for c in conversations %}
+    <a class="conv {% if c.unread %}unread{% endif %} {% if conv and c.pk == conv.pk %}active{% endif %}" href="{% url 'conversation' c.pk %}">
+      {% avatar c.other_user 50 online=True %}
+      <div class="grow" style="min-width:0">
+        <div class="row-between"><span class="name truncate">{{ c.other_user.full_name }}</span><span class="time">{{ c.last.created_at|ago }}</span></div>
+        <div class="row-between"><span class="preview">{% if c.last.sender == user %}You: {% endif %}{{ c.last.text }}</span>
+          {% if c.unread %}<span class="badge">{{ c.unread }}</span>{% endif %}</div>
+      </div>
+    </a>
+    {% empty %}
+    <div class="empty" style="padding:30px 10px"><div class="empty-icon"><i class="bi bi-chat-heart"></i></div>
+      <h3>{% if q %}No results{% else %}No messages yet{% endif %}</h3><p>Start a conversation with one of your connections.</p></div>
+    {% endfor %}
+  </div>
+</div>

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Account{% endblock %}
+{% block content %}
+<a href="{% url 'settings' %}" class="back-link"><i class="bi bi-arrow-left"></i> Settings</a>
+<div class="page-head"><h1>Account</h1></div>
+<form method="post" class="card" novalidate>
+  {% csrf_token %}
+  <h3 class="mb-2">Basic information</h3>
+  {% include "partials/field.html" with field=form.full_name icon="person" %}
+  {% include "partials/field.html" with field=form.email icon="envelope" %}
+  <button class="btn btn-primary" type="submit">Save</button>
+</form>
+<form method="post" class="card" novalidate>
+  {% csrf_token %}
+  <input type="hidden" name="change_password" value="1">
+  <h3 class="mb-2">Change password</h3>
+  {% include "partials/field.html" with field=pwd_form.old_password icon="lock" password=True %}
+  {% include "partials/field.html" with field=pwd_form.new_password1 icon="shield-lock" password=True %}
+  {% include "partials/field.html" with field=pwd_form.new_password2 icon="shield-check" password=True %}
+  <button class="btn btn-primary" type="submit">Update password</button>
+</form>
+{% endblock %}

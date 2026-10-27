@@ -1,0 +1,17 @@
+{% load core_tags %}
+<a class="event-card" href="{{ e.get_absolute_url }}">
+  <div class="cover">
+    {% if e.image %}<img src="{{ e.image.url }}" alt="" loading="lazy">{% endif %}
+    <div class="date-badge"><div class="m">{{ e.starts_at|date:"M" }}</div><div class="d">{{ e.starts_at|date:"d" }}</div></div>
+    <span class="float glass">{% if e.pk|in_set:my_ids %}✓ Going{% else %}{{ e.get_category_display }}{% endif %}</span>
+  </div>
+  <div class="body">
+    <h3>{{ e.title }}</h3>
+    <span class="line"><i class="bi bi-clock"></i> {{ e.starts_at|date:"D d M · H:i" }}</span>
+    <span class="line truncate"><i class="bi {% if e.is_online %}bi-camera-video{% else %}bi-geo-alt{% endif %}"></i> {{ e.location }}</span>
+    <div class="foot">
+      <span class="subtle"><i class="bi bi-people-fill"></i> {{ e.going }} going</span>
+      {% if e.capacity %}<span class="chip chip-gray" style="font-size:.7rem;padding:3px 8px">{{ e.capacity }} spots</span>{% endif %}
+    </div>
+  </div>
+</a>

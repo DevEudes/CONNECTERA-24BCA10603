@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Create an event{% endblock %}
+{% block content %}
+<a href="{% url 'events' %}" class="back-link"><i class="bi bi-arrow-left"></i> Events</a>
+<div class="page-head"><div><h1>Create an event</h1><p>Organize a workshop, a meetup or a party for students.</p></div></div>
+<form method="post" enctype="multipart/form-data" class="card" novalidate>
+  {% csrf_token %}
+  {% include "partials/field.html" with field=form.title %}
+  <div class="grid-2">
+    {% include "partials/field.html" with field=form.category %}
+    {% include "partials/field.html" with field=form.community %}
+    {% include "partials/field.html" with field=form.starts_at %}
+    {% include "partials/field.html" with field=form.ends_at %}
+    {% include "partials/field.html" with field=form.location %}
+    {% include "partials/field.html" with field=form.capacity %}
+  </div>
+  <label class="switch"><span><b>Online event</b><span class="subtle" style="display:block">The location is a meeting link</span></span>{{ form.is_online }}</label>
+  {% include "partials/field.html" with field=form.description %}
+  <div class="field"><span class="label">Cover image</span>
+    <div id="ev-prev" class="post-image hidden mb-1" style="border-radius:16px;overflow:hidden;max-height:200px"></div>
+    <span class="btn btn-soft file-btn" style="align-self:flex-start"><i class="bi bi-image"></i> Choose image<input type="file" name="image" accept="image/*" data-preview="#ev-prev"></span>
+    {% for e in form.image.errors %}<p class="error">{{ e }}</p>{% endfor %}
+  </div>
+  <button class="btn btn-primary btn-lg btn-block" type="submit"><i class="bi bi-calendar-plus"></i> Publish event</button>
+</form>
+{% endblock %}

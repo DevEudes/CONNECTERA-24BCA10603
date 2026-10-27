@@ -1,0 +1,19 @@
+{% load core_tags %}
+<article class="c-card">
+  <a href="{{ c.get_absolute_url }}" class="cover">
+    {% if c.image %}<img src="{{ c.image.url }}" alt="" loading="lazy">{% endif %}
+    <span class="icon">{{ c.icon }}</span>
+    <span class="float glass">{{ c.get_category_display }}</span>
+  </a>
+  <div class="body">
+    <a href="{{ c.get_absolute_url }}" style="color:var(--text)"><h3>{{ c.name }}</h3></a>
+    <p class="desc">{{ c.tagline|default:c.description }}</p>
+    <div class="foot">
+      <span class="subtle"><i class="bi bi-people-fill"></i> {{ c.member_total|default:c.members.count }} members</span>
+      <form method="post" action="{% url 'toggle_membership' c.slug %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+        {% if c.pk|in_set:my_ids %}<button class="btn btn-soft btn-sm" type="submit"><i class="bi bi-check2"></i> Joined</button>
+        {% else %}<button class="btn btn-primary btn-sm" type="submit"><i class="bi bi-plus-lg"></i> Join</button>{% endif %}
+      </form>
+    </div>
+  </div>
+</article>

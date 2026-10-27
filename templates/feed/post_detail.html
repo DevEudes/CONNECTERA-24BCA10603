@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Post by {{ post.author.full_name }}{% endblock %}
+{% block content %}
+<a href="{% url 'home' %}" class="back-link"><i class="bi bi-arrow-left"></i> Back to feed</a>
+{% include "feed/_post.html" with expanded=True %}
+{% endblock %}

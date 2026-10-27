@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load core_tags %}
+{% block title %}Log out{% endblock %}
+{% block content %}
+<div class="card center mt-4" style="max-width:440px;margin-left:auto;margin-right:auto;padding:36px 28px">
+  <div class="big-icon" style="margin:0 auto 18px"><i class="bi bi-box-arrow-right"></i></div>
+  <h2>Log out of Connectera?</h2>
+  <p class="muted mt-1">You'll need to sign in again to see your feed, messages and notifications.</p>
+  <div class="row mt-3" style="justify-content:center">{% avatar user 36 %} <span class="bold">{{ user.email }}</span></div>
+  <form method="post" class="col mt-3">
+    {% csrf_token %}
+    <button class="btn btn-primary btn-lg btn-block" type="submit">Yes, log me out</button>
+    <a href="{% url 'home' %}" class="btn btn-outline btn-lg btn-block">Cancel</a>
+  </form>
+</div>
+{% endblock %}

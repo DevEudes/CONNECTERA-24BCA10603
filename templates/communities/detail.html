@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load core_tags %}
+{% block title %}{{ community.name }}{% endblock %}
+{% block content %}
+<a href="{% url 'communities' %}" class="back-link"><i class="bi bi-arrow-left"></i> Communities</a>
+
+<section class="hero">
+  {% if community.image %}<img src="{{ community.image.url }}" alt="">{% endif %}
+  <div class="content">
+    <span class="tag">{{ community.icon }} {{ community.get_category_display }}</span>
+    <h1 class="mt-1">{{ community.name }}</h1>
+    {% if community.tagline %}<p style="opacity:.9">{{ community.tagline }}</p>{% endif %}
+    <div class="row-between wrap mt-2">
+      <div class="row">
+        <div class="avatar-stack">{% for m in members|slice:":4" %}{% avatar m 30 %}{% endfor %}</div>
+        <span class="small bold">{{ member_total }} member{{ member_total|pluralize }}</span>
+      </div>
+      <form method="post" action="{% url 'toggle_membership' community.slug %}" {% if is_member %}data-confirm="Leave {{ community.name }}?"{% endif %}>{% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.path }}">
+        {% if is_member %}<button class="btn btn-white" type="submit"><i class="bi bi-check2"></i> Joined · Leave</button>
+        {% else %}<button class="btn btn-white" type="submit"><i class="bi bi-plus-lg"></i> Join community</button>{% endif %}
+      </form>
+    </div>
+  </div>
+</section>
+
+<div class="card mt-3">
+  <h3 class="mb-1">About</h3>
+  <p class="muted" style="white-space:pre-line">{{ community.description }}</p>
+  {% if community.interests.exists %}<div class="chips mt-2">{% for i in community.interests.all %}<span class="chip">{{ i.icon }} {{ i.name }}</span>{% endfor %}</div>{% endif %}
+  {% if community.creator %}<div class="row mt-2 small muted">{% avatar community.creator 28 %} Created by <a href="{{ community.creator.get_absolute_url }}" class="bold">{{ community.creator.full_name }}</a></div>{% endif %}
+  <div class="row mt-2"><a href="{% url 'report' 'community' community.pk %}?next={{ request.path|urlencode }}" class="subtle small"><i class="bi bi-flag"></i> Report</a></div>
+</div>
+
+{% if events %}
+<div class="card mt-3">
+  <div class="card-title"><h3>Upcoming events</h3>{% if is_member %}<a href="{% url 'create_event' %}?community={{ community.pk }}">+ New event</a>{% endif %}</div>
+  {% for e in events %}
+  <a class="mini-event" href="{{ e.get_absolute_url }}">
+    <div class="date-badge"><div class="m">{{ e.starts_at|date:"M" }}</div><div class="d">{{ e.starts_at|date:"d" }}</div></div>
+    <div class="grow"><b style="display:block">{{ e.title }}</b><span class="subtle">{{ e.starts_at|date:"D H:i" }} · {{ e.location }}</span></div>
+    <i class="bi bi-chevron-right subtle"></i>
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="card mt-3">
+  <div class="card-title"><h3>Members</h3><span class="subtle">{{ member_total }}</span></div>
+  <div class="row wrap">
+    {% for m in members %}<a href="{{ m.get_absolute_url }}" title="{{ m.full_name }}">{% avatar m 44 online=True %}</a>{% empty %}<span class="subtle">Be the first member!</span>{% endfor %}
+  </div>
+</div>
+
+<div class="row-between mt-4 mb-2"><h3>Discussion</h3>
+  {% if is_member %}<a href="{% url 'create_post' %}?community={{ community.pk }}" class="btn btn-primary btn-sm"><i class="bi bi-pencil"></i> Post</a>{% else %}<span class="subtle small">Join to post</span>{% endif %}</div>
+<div class="feed-list">
+  {% for post in posts %}{% include "feed/_post.html" %}{% empty %}
+  <div class="card empty"><div class="empty-icon"><i class="bi bi-chat-square-heart"></i></div><h3>No posts yet</h3><p>Start the conversation in {{ community.name }}!</p>
+    {% if is_member %}<a href="{% url 'create_post' %}?community={{ community.pk }}" class="btn btn-primary">Write the first post</a>{% endif %}</div>
+  {% endfor %}
+</div>
+{% endblock %}

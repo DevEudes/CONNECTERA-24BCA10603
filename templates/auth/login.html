@@ -1,0 +1,23 @@
+{% extends "auth/base_auth.html" %}
+{% block title %}Sign in{% endblock %}
+{% block form %}
+<h1>Welcome back 👋</h1>
+<p class="lead">Sign in to continue to your student network.</p>
+<form method="post" novalidate>
+  {% csrf_token %}
+  {% include "partials/field.html" with field=form.email icon="envelope" %}
+  {% include "partials/field.html" with field=form.password icon="lock" password=True %}
+  <div class="row-between mb-3">
+    <label class="check">{{ form.remember }} Remember me</label>
+    <a href="{% url 'forgot_password' %}" class="small bold">Forgot password?</a>
+  </div>
+  <button class="btn btn-primary btn-lg btn-block" type="submit">Sign in <i class="bi bi-arrow-right"></i></button>
+</form>
+<div class="divider">or continue with</div>
+<div class="social-btns">
+  <button class="btn btn-outline" type="button" disabled title="Coming soon"><i class="bi bi-google"></i> Google</button>
+  <button class="btn btn-outline" type="button" disabled title="Coming soon"><i class="bi bi-apple"></i> Apple</button>
+</div>
+<p class="alt-link">New to Connectera? <a href="{% url 'signup' %}">Create an account</a></p>
+<div class="demo-box"><i class="bi bi-lightbulb"></i> Demo account: <code>marie@connectera.app</code> / <code>Demo@1234</code></div>
+{% endblock %}

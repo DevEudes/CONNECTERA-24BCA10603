@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Report{% endblock %}
+{% block content %}
+<a href="{{ next }}" class="back-link"><i class="bi bi-arrow-left"></i> Back</a>
+<div class="card" style="max-width:520px;margin:0 auto">
+  <div class="big-icon mb-2" style="background:linear-gradient(135deg,#ef4444,#ec4899)"><i class="bi bi-flag"></i></div>
+  <h2>Report this {{ target_type }}</h2>
+  <p class="muted mt-1 mb-3">Reports are anonymous. Our moderators review every report and take action when our community rules are broken.</p>
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
+    <div class="field"><span class="label">Why are you reporting this?</span>
+      <div class="radio-cards">{% for r in form.reason %}<label>{{ r.tag }} {{ r.choice_label }}</label>{% endfor %}</div>
+      {% for e in form.reason.errors %}<p class="error">{{ e }}</p>{% endfor %}
+    </div>
+    {% include "partials/field.html" with field=form.details %}
+    <div class="row">
+      <a href="{{ next }}" class="btn btn-outline grow">Cancel</a>
+      <button class="btn btn-primary grow" type="submit">Submit report</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

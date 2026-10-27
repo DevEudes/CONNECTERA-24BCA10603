@@ -1,0 +1,33 @@
+{% extends "base_page.html" %}
+{% load core_tags %}
+{% block title %}Select your interests{% endblock %}
+{% block body %}
+<div class="setup">
+  <div class="wrapper">
+    <div class="row-between">
+      <span class="brand">{% include "partials/logo.html" with size=34 %} Connectera</span>
+      {% if editing %}<a href="{% url 'my_profile' %}" class="btn btn-ghost btn-sm"><i class="bi bi-x-lg"></i> Cancel</a>{% else %}<span class="subtle bold">Step 2 of 2</span>{% endif %}
+    </div>
+    <div class="steps"><span class="on"></span><span class="on"></span></div>
+    <h1>What are you into? 💜</h1>
+    <p class="muted mt-1 mb-3">Pick at least 3 interests. We'll use them to recommend students, communities and events.</p>
+
+    <form method="post" id="interest-form" novalidate>
+      {% csrf_token %}
+      {% for e in form.interests.errors %}<p class="error mb-2">{{ e }}</p>{% endfor %}
+      <div class="interest-grid">
+        {% for i in interests %}
+        <div class="interest">
+          <input type="checkbox" name="interests" value="{{ i.pk }}" id="int-{{ i.pk }}" {% if i.pk|in_set:selected %}checked{% endif %}>
+          <label for="int-{{ i.pk }}"><span class="em">{{ i.icon }}</span> {{ i.name }}</label>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="card mt-3 row-between sticky-cta" style="bottom:16px">
+        <span class="muted"><b class="text-grad" id="interest-count" style="font-size:1.2rem">0</b> selected</span>
+        <button class="btn btn-primary btn-lg" id="interest-submit" type="submit">{% if editing %}Save interests{% else %}Finish{% endif %} <i class="bi bi-check2"></i></button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load core_tags %}
+{% block title %}Chat with {{ other.full_name }}{% endblock %}
+{% block app_class %}main-wide{% endblock %}
+{% block content %}
+<div class="chat-layout in-conv">
+  {% include "chat/_list.html" %}
+  <section class="chat-pane" id="chat" data-poll-url="{% url 'poll_messages' conv.pk %}" data-last-id="{% with chat_messages.last as l %}{{ l.pk|default:0 }}{% endwith %}">
+    <header class="head">
+      <a href="{% url 'inbox' %}" class="btn btn-ghost btn-icon btn-sm chat-back" aria-label="Back"><i class="bi bi-arrow-left"></i></a>
+      <a href="{{ other.get_absolute_url }}">{% avatar other 44 online=True %}</a>
+      <div class="grow" style="min-width:0">
+        <a href="{{ other.get_absolute_url }}" class="bold" style="color:var(--text)">{{ other.full_name }}</a>
+        <div class="status {% if other.is_online %}on{% endif %}" id="chat-status">{% if other.is_online %}Online{% else %}Offline{% endif %}</div>
+      </div>
+      <a href="{{ other.get_absolute_url }}" class="btn btn-ghost btn-icon btn-sm" aria-label="Profile"><i class="bi bi-info-circle"></i></a>
+    </header>
+
+    <div class="chat-messages" id="chat-messages" aria-live="polite">
+      {% for m in chat_messages %}
+        {% ifchanged m.created_at|date:"Ymd" %}<div class="day-sep">{{ m.created_at|date:"l d F" }}</div>{% endifchanged %}
+        <div class="msg {% if m.sender_id == user.pk %}me{% endif %}">
+          {% if m.sender_id != user.pk %}{% avatar other 30 %}{% endif %}
+          <div><div class="bubble">{{ m.text|urlize }}</div><div class="time">{{ m.created_at|time:"H:i" }}</div></div>
+        </div>
+      {% empty %}
+        <div class="empty" id="chat-empty">{% avatar other 80 %}<h3 class="mt-2">Say hi to {{ other.first_name_display }} 👋</h3>
+          <p>{{ other.course }} · {{ other.university }}</p></div>
+      {% endfor %}
+    </div>
+    {% with chat_messages.last as last %}{% if last and last.sender_id == user.pk %}
+      <div class="seen" id="seen-flag">{% if last.read_at %}<i class="bi bi-check2-all"></i> Seen{% else %}Sent{% endif %}</div>
+    {% else %}<div class="seen" id="seen-flag"></div>{% endif %}{% endwith %}
+
+    {% if can_send %}
+    <form class="chat-input" id="chat-form" method="post" action="{% url 'send_message' conv.pk %}">
+      {% csrf_token %}
+      <textarea name="text" rows="1" maxlength="2000" data-autogrow placeholder="Write a message…" aria-label="Message" required></textarea>
+      <button class="btn btn-primary btn-icon" type="submit" aria-label="Send"><i class="bi bi-send-fill"></i></button>
+    </form>
+    {% else %}
+    <div class="chat-input center" style="justify-content:center"><span class="muted small"><i class="bi bi-lock"></i> You can't reply to this conversation.</span></div>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

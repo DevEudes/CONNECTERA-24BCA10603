@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load core_tags %}
+{% block title %}Edit profile{% endblock %}
+{% block content %}
+<a href="{% url 'my_profile' %}" class="back-link"><i class="bi bi-arrow-left"></i> Back to profile</a>
+<div class="page-head"><div><h1>Edit profile</h1><p>Keep your academic profile up to date.</p></div></div>
+
+<form method="post" enctype="multipart/form-data" novalidate>
+  {% csrf_token %}
+  <div class="card card-flush">
+    <div class="profile-cover" id="cover-preview" style="height:140px">{% if user.cover %}<img src="{{ user.cover.url }}" alt="">{% endif %}</div>
+    <div style="padding:0 20px 20px">
+      <div class="row-between" style="margin-top:-46px;position:relative;z-index:2;align-items:flex-end">
+        <div class="avatar-upload" style="margin:0">
+          <div class="preview" id="avatar-preview" style="border:4px solid var(--surface);background:var(--surface)">{% if user.avatar %}<img src="{{ user.avatar.url }}" alt="">{% else %}<i class="bi bi-camera"></i>{% endif %}</div>
+        </div>
+        <span class="btn btn-outline btn-sm file-btn"><i class="bi bi-image"></i> Change cover
+          <input type="file" name="cover" accept="image/*" data-preview="#cover-preview"></span>
+      </div>
+      <div class="row mt-2 wrap">
+        <span class="btn btn-soft btn-sm file-btn"><i class="bi bi-camera"></i> Change photo
+          <input type="file" name="avatar" accept="image/*" data-preview="#avatar-preview"></span>
+        {% if user.avatar %}<button class="btn btn-ghost btn-sm" name="remove_avatar" value="1" type="submit"><i class="bi bi-trash"></i> Remove photo</button>{% endif %}
+      </div>
+      {% for e in form.avatar.errors %}<p class="error">{{ e }}</p>{% endfor %}
+      {% for e in form.cover.errors %}<p class="error">{{ e }}</p>{% endfor %}
+    </div>
+  </div>
+
+  <div class="card mt-3">
+    <h3 class="mb-2">Personal info</h3>
+    {% include "partials/field.html" with field=form.full_name %}
+    {% include "partials/field.html" with field=form.headline %}
+    {% include "partials/field.html" with field=form.bio %}
+    <div class="grid-2">
+      {% include "partials/field.html" with field=form.country %}
+      {% include "partials/field.html" with field=form.destination_country %}
+    </div>
+  </div>
+
+  <div class="card mt-3">
+    <h3 class="mb-2">Academic info</h3>
+    <div class="grid-2">
+      {% include "partials/field.html" with field=form.university %}
+      {% include "partials/field.html" with field=form.course %}
+    </div>
+    {% include "partials/field.html" with field=form.year %}
+    <datalist id="universities">{% for u in universities %}<option value="{{ u }}">{% endfor %}</datalist>
+    <datalist id="courses">{% for c in courses %}<option value="{{ c }}">{% endfor %}</datalist>
+  </div>
+
+  <div class="card mt-3 row-between">
+    <div><b>Interests</b><div class="chips mt-1">{% for i in user.interests.all|slice:":5" %}<span class="chip">{{ i.icon }} {{ i.name }}</span>{% endfor %}</div></div>
+    <a href="{% url 'select_interests' %}" class="btn btn-soft btn-sm">Edit</a>
+  </div>
+
+  <div class="row mt-3 sticky-cta">
+    <a href="{% url 'my_profile' %}" class="btn btn-outline btn-lg grow">Cancel</a>
+    <button class="btn btn-primary btn-lg grow" type="submit"><i class="bi bi-check2"></i> Save changes</button>
+  </div>
+</form>
+{% endblock %}

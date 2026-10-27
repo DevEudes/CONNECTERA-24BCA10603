@@ -1,0 +1,29 @@
+{% load core_tags %}
+<article class="person-card">
+  <div class="band alt{{ p.pk|mod:4 }}"></div>
+  <div class="body">
+    <a href="{{ p.get_absolute_url }}">{% avatar p 72 online=True %}</a>
+    <a class="name" href="{{ p.get_absolute_url }}">{{ p.full_name }}</a>
+    <span class="sub">{{ p.course }}{% if p.year %} · {{ p.year_label }}{% endif %}</span>
+    <span class="sub"><i class="bi bi-mortarboard"></i> {{ p.university }}</span>
+    <div class="chips">
+      {% if p.match_reasons %}{% for r in p.match_reasons %}<span class="chip chip-match">{{ r }}</span>{% endfor %}
+      {% else %}{% for i in p.interests.all|slice:":3" %}<span class="chip">{{ i.icon }} {{ i.name }}</span>{% endfor %}{% endif %}
+    </div>
+    <div class="foot">
+      {% if p.conn_state == "connected" %}
+        <a class="btn btn-soft btn-sm" href="{% url 'start_chat' p.pk %}"><i class="bi bi-chat-dots"></i> Message</a>
+      {% elif p.conn_state == "sent" %}
+        <button class="btn btn-soft btn-sm" disabled><i class="bi bi-hourglass-split"></i> Pending</button>
+      {% elif p.conn_state == "received" %}
+        <form method="post" action="{% url 'respond_request' p.conn_id 'accept' %}" data-connect>{% csrf_token %}
+          <button class="btn btn-primary btn-sm btn-block" type="submit"><i class="bi bi-check2"></i> Accept</button></form>
+      {% else %}
+        <form method="post" action="{% url 'send_request' p.pk %}" data-connect>{% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button class="btn btn-primary btn-sm btn-block" type="submit"><i class="bi bi-person-plus"></i> Connect</button></form>
+      {% endif %}
+      <a class="btn btn-outline btn-sm" href="{{ p.get_absolute_url }}">View</a>
+    </div>
+  </div>
+</article>

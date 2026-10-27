@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load core_tags %}
+{% block title %}Events{% endblock %}
+{% block app_class %}main-wide{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Events</h1><p>Workshops, meetups, hackathons and campus parties.</p></div>
+  <a href="{% url 'create_event' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Create event</a></div>
+
+<div class="row wrap mb-2">
+  <div class="tabs" style="flex:0 0 auto">
+    <a href="?tab=upcoming" class="{% if tab == 'upcoming' %}active{% endif %}">Upcoming</a>
+    <a href="?tab=mine" class="{% if tab == 'mine' %}active{% endif %}">My events</a>
+    <a href="?tab=past" class="{% if tab == 'past' %}active{% endif %}">Past</a>
+  </div>
+  <form method="get" class="searchbar grow" style="min-width:220px"><input type="hidden" name="tab" value="{{ tab }}"><i class="bi bi-search"></i>
+    <input type="search" name="q" value="{{ q }}" placeholder="Search events or places…" aria-label="Search events"></form>
+</div>
+<div class="pills mb-3">
+  <a href="?tab={{ tab }}&q={{ q|urlencode }}" class="{% if not category %}active{% endif %}">All</a>
+  {% for v, l in categories %}<a href="?tab={{ tab }}&q={{ q|urlencode }}&category={{ v }}" class="{% if category == v %}active{% endif %}">{{ l }}</a>{% endfor %}
+</div>
+
+{% if featured %}
+<a href="{{ featured.get_absolute_url }}" class="hero mb-3" style="display:flex">
+  {% if featured.image %}<img src="{{ featured.image.url }}" alt="">{% endif %}
+  <div class="content">
+    <span class="tag"><i class="bi bi-lightning-charge-fill"></i> Next up · {{ featured.get_category_display }}</span>
+    <h1 class="mt-1">{{ featured.title }}</h1>
+    <div class="meta">
+      <span><i class="bi bi-calendar3"></i> {{ featured.starts_at|date:"l d F · H:i" }}</span>
+      <span><i class="bi bi-geo-alt"></i> {{ featured.location }}</span>
+      <span><i class="bi bi-people"></i> {{ featured.going }} going</span>
+    </div>
+  </div>
+</a>
+{% endif %}
+
+<div class="grid-cards three">
+  {% for e in events %}{% include "events/_card.html" %}{% empty %}
+    {% if not featured %}
+    <div class="card empty" style="grid-column:1/-1"><div class="empty-icon"><i class="bi bi-calendar-x"></i></div>
+      <h3>{% if tab == 'mine' %}No upcoming events for you{% else %}No events found{% endif %}</h3>
+      <p>Browse upcoming events and register in one click.</p>
+      <a href="?tab=upcoming" class="btn btn-primary">See upcoming events</a></div>
+    {% endif %}
+  {% endfor %}
+</div>
+{% endblock %}

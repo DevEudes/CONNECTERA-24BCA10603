@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load core_tags %}
+{% block title %}Blocked users{% endblock %}
+{% block content %}
+<a href="{% url 'settings' %}" class="back-link"><i class="bi bi-arrow-left"></i> Settings</a>
+<div class="page-head"><div><h1>Blocked users</h1><p>Blocked students can't see your profile, posts or message you.</p></div></div>
+<div class="card">
+  {% for b in blocked %}
+  <div class="list-item">
+    {% avatar b 46 %}
+    <div class="grow"><span class="name">{{ b.full_name }}</span><div class="meta">{{ b.university }}</div></div>
+    <form method="post" action="{% url 'unblock_user' b.pk %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}">
+      <button class="btn btn-outline btn-sm" type="submit">Unblock</button></form>
+  </div>
+  {% empty %}
+  <div class="empty"><div class="empty-icon"><i class="bi bi-emoji-smile"></i></div><h3>Nobody is blocked</h3><p>Good vibes only ✌️</p></div>
+  {% endfor %}
+</div>
+{% endblock %}

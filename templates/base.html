@@ -1,0 +1,61 @@
+{% extends "base_page.html" %}
+{% load core_tags %}
+{% block body %}
+{% with url=request.resolver_match.url_name %}
+<div class="app {% block app_class %}{% endblock %}">
+
+  {# ---------- Desktop sidebar ---------- #}
+  <aside class="sidebar" aria-label="Main navigation">
+    <a href="{% url 'home' %}" class="brand">{% include "partials/logo.html" with size=38 %} Connectera</a>
+    <a class="nav-link {% if url == 'home' %}active{% endif %}" href="{% url 'home' %}"><i class="bi bi-house-door{% if url == 'home' %}-fill{% endif %}"></i> Home</a>
+    <a class="nav-link {% if url == 'search' %}active{% endif %}" href="{% url 'search' %}"><i class="bi bi-search"></i> Discover</a>
+    <a class="nav-link {% if url == 'connections' %}active{% endif %}" href="{% url 'connections' %}"><i class="bi bi-people{% if url == 'connections' %}-fill{% endif %}"></i> Connections
+      <span class="badge {% if not pending_requests %}hidden{% endif %}" data-badge="requests">{{ pending_requests }}</span></a>
+    <a class="nav-link {% if url == 'inbox' or url == 'conversation' %}active{% endif %}" href="{% url 'inbox' %}"><i class="bi bi-chat-dots{% if url == 'inbox' or url == 'conversation' %}-fill{% endif %}"></i> Messages
+      <span class="badge {% if not unread_messages %}hidden{% endif %}" data-badge="messages">{{ unread_messages }}</span></a>
+    <a class="nav-link {% if 'communit' in url %}active{% endif %}" href="{% url 'communities' %}"><i class="bi bi-collection{% if 'communit' in url %}-fill{% endif %}"></i> Communities</a>
+    <a class="nav-link {% if 'event' in url %}active{% endif %}" href="{% url 'events' %}"><i class="bi bi-calendar-event{% if 'event' in url %}-fill{% endif %}"></i> Events</a>
+    <a class="nav-link {% if url == 'notifications' %}active{% endif %}" href="{% url 'notifications' %}"><i class="bi bi-bell{% if url == 'notifications' %}-fill{% endif %}"></i> Notifications
+      <span class="badge {% if not unread_notifications %}hidden{% endif %}" data-badge="notifications">{{ unread_notifications }}</span></a>
+    <a class="nav-link {% if url == 'my_profile' or url == 'edit_profile' %}active{% endif %}" href="{% url 'my_profile' %}"><i class="bi bi-person-circle"></i> Profile</a>
+    <a class="nav-link {% if 'settings' in url %}active{% endif %}" href="{% url 'settings' %}"><i class="bi bi-gear{% if 'settings' in url %}-fill{% endif %}"></i> Settings</a>
+    {% if user.is_staff %}<a class="nav-link" href="/admin/"><i class="bi bi-shield-lock"></i> Admin</a>{% endif %}
+    <a href="{% url 'create_post' %}" class="btn btn-primary btn-block create-btn"><i class="bi bi-plus-lg"></i> Create post</a>
+    <a href="{% url 'my_profile' %}" class="me-card">
+      {% avatar user 40 %}
+      <span class="grow"><b class="truncate" style="display:block">{{ user.full_name }}</b><span class="subtle truncate" style="display:block">{{ user.course }} · {{ user.university }}</span></span>
+      <i class="bi bi-chevron-right subtle"></i>
+    </a>
+  </aside>
+
+  {# ---------- Main column ---------- #}
+  <div class="grow" style="min-width:0">
+    <header class="topbar">
+      <a href="{% url 'home' %}" class="brand">{% include "partials/logo.html" with size=32 %} Connectera</a>
+      <div class="actions">
+        <a class="icon-link" href="{% url 'events' %}" aria-label="Events"><i class="bi bi-calendar-event"></i></a>
+        <a class="icon-link" href="{% url 'communities' %}" aria-label="Communities"><i class="bi bi-collection"></i></a>
+        <a class="icon-link" href="{% url 'notifications' %}" aria-label="Notifications"><i class="bi bi-bell"></i>
+          <span class="badge {% if not unread_notifications %}hidden{% endif %}" data-badge="notifications">{{ unread_notifications }}</span></a>
+      </div>
+    </header>
+    <main class="main" id="main">
+      <div class="main-inner">{% block content %}{% endblock %}</div>
+    </main>
+  </div>
+
+  {# ---------- Right rail (wide screens) ---------- #}
+  {% block rightbar %}{% endblock %}
+
+  {# ---------- Mobile bottom nav: Home, Search, Create, Chats, Profile ---------- #}
+  <nav class="bottom-nav" aria-label="Mobile navigation">
+    <a href="{% url 'home' %}" class="{% if url == 'home' %}active{% endif %}"><i class="bi bi-house-door{% if url == 'home' %}-fill{% endif %}"></i>Home</a>
+    <a href="{% url 'search' %}" class="{% if url == 'search' %}active{% endif %}"><i class="bi bi-search"></i>Search</a>
+    <a href="{% url 'create_post' %}" class="create" aria-label="Create post"><i class="bi bi-plus-lg"></i></a>
+    <a href="{% url 'inbox' %}" class="{% if url == 'inbox' or url == 'conversation' %}active{% endif %}"><i class="bi bi-chat-dots{% if url == 'inbox' or url == 'conversation' %}-fill{% endif %}"></i>Chats
+      <span class="badge {% if not unread_messages %}hidden{% endif %}" data-badge="messages">{{ unread_messages }}</span></a>
+    <a href="{% url 'my_profile' %}" class="{% if url == 'my_profile' or 'settings' in url %}active{% endif %}"><i class="bi bi-person{% if url == 'my_profile' %}-fill{% endif %}"></i>Profile</a>
+  </nav>
+</div>
+{% endwith %}
+{% endblock %}

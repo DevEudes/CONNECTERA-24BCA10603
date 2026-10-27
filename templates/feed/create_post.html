@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load core_tags %}
+{% block title %}Create post{% endblock %}
+{% block content %}
+<a href="{% url 'home' %}" class="back-link"><i class="bi bi-arrow-left"></i> Back</a>
+<div class="page-head"><div><h1>Create a post</h1><p>Share a moment, a question or an achievement.</p></div></div>
+<form method="post" enctype="multipart/form-data" class="card" novalidate>
+  {% csrf_token %}
+  <div class="row mb-2">{% avatar user 48 %}<div><b>{{ user.full_name }}</b>
+    <div class="subtle">Posting to
+      <select name="community" class="input" style="display:inline-block;width:auto;padding:4px 10px;border-radius:999px;font-size:.82rem">
+        <option value="">🌍 Public feed</option>
+        {% for c in form.fields.community.queryset %}<option value="{{ c.pk }}" {% if form.community.value|stringformat:"s" == c.pk|stringformat:"s" %}selected{% endif %}>{{ c.icon }} {{ c.name }}</option>{% endfor %}
+      </select></div></div></div>
+  <div class="field">
+    <textarea name="text" rows="5" maxlength="2000" data-autogrow placeholder="What's on your mind, {{ user.first_name_display }}?" class="input" style="border:0;background:transparent;font-size:1.05rem;padding:8px 0;box-shadow:none" aria-label="Post text">{{ form.text.value|default:"" }}</textarea>
+  </div>
+  <div id="post-preview" class="post-image hidden mb-2" style="border-radius:16px;overflow:hidden"></div>
+  {% for e in form.non_field_errors %}<p class="error mb-2">{{ e }}</p>{% endfor %}
+  {% for e in form.image.errors %}<p class="error mb-2">{{ e }}</p>{% endfor %}
+  <hr>
+  <div class="row-between wrap">
+    <span class="btn btn-soft file-btn"><i class="bi bi-image"></i> Add photo
+      <input type="file" name="image" accept="image/*" data-preview="#post-preview"></span>
+    <button class="btn btn-primary btn-lg" type="submit">Publish <i class="bi bi-send"></i></button>
+  </div>
+</form>
+{% endblock %}

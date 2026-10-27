@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load core_tags %}
+{% block title %}Messages{% endblock %}
+{% block app_class %}main-wide{% endblock %}
+{% block content %}
+<div class="chat-layout">
+  {% include "chat/_list.html" %}
+  <div class="chat-pane chat-empty-pane">
+    <div class="empty">
+      <div class="empty-icon"><i class="bi bi-chat-dots"></i></div>
+      <h3>Your messages</h3>
+      <p>Select a conversation or start a new one with a connection.</p>
+      {% if contacts %}
+      <div class="row wrap" style="justify-content:center">
+        {% for p in contacts|slice:":6" %}<a href="{% url 'start_chat' p.pk %}" title="Message {{ p.full_name }}">{% avatar p 46 online=True %}</a>{% endfor %}
+      </div>
+      {% else %}<a href="{% url 'search' %}" class="btn btn-primary">Find students</a>{% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

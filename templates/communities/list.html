@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Communities{% endblock %}
+{% block app_class %}main-wide{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Communities</h1><p>Find your tribe — clubs, study groups and student associations.</p></div>
+  <a href="{% url 'create_community' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Create</a></div>
+
+<div class="row wrap mb-2">
+  <div class="tabs" style="flex:0 0 auto">
+    <a href="?tab=discover" class="{% if tab != 'mine' %}active{% endif %}"><i class="bi bi-compass"></i> Discover</a>
+    <a href="?tab=mine" class="{% if tab == 'mine' %}active{% endif %}"><i class="bi bi-bookmark-heart"></i> My communities · {{ my_ids|length }}</a>
+  </div>
+  <form method="get" class="searchbar grow" style="min-width:220px"><input type="hidden" name="tab" value="{{ tab }}"><i class="bi bi-search"></i>
+    <input type="search" name="q" value="{{ q }}" placeholder="Search communities…" aria-label="Search communities"></form>
+</div>
+<div class="pills mb-3">
+  <a href="?tab={{ tab }}&q={{ q|urlencode }}" class="{% if not category %}active{% endif %}">All</a>
+  {% for v, l in categories %}<a href="?tab={{ tab }}&q={{ q|urlencode }}&category={{ v }}" class="{% if category == v %}active{% endif %}">{{ l }}</a>{% endfor %}
+</div>
+
+{% if recommended %}
+<h2 class="mb-2">Recommended for you <span class="text-grad">✦</span></h2>
+<div class="grid-cards three mb-3">{% for c in recommended %}{% include "communities/_card.html" %}{% endfor %}</div>
+<h2 class="mt-4 mb-2">All communities</h2>
+{% endif %}
+
+<div class="grid-cards three">
+  {% for c in communities %}{% include "communities/_card.html" %}{% empty %}
+  <div class="card empty" style="grid-column:1/-1"><div class="empty-icon"><i class="bi bi-collection"></i></div>
+    <h3>{% if tab == 'mine' %}You haven't joined any community{% else %}No communities found{% endif %}</h3>
+    <p>Join a community to meet students who share your passions.</p>
+    <a href="{% if tab == 'mine' %}?tab=discover{% else %}{% url 'create_community' %}{% endif %}" class="btn btn-primary">{% if tab == 'mine' %}Discover communities{% else %}Create one{% endif %}</a></div>
+  {% endfor %}
+</div>
+{% endblock %}

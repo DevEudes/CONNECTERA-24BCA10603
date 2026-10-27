@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Privacy & Security{% endblock %}
+{% block content %}
+<a href="{% url 'settings' %}" class="back-link"><i class="bi bi-arrow-left"></i> Settings</a>
+<div class="page-head"><div><h1>Privacy &amp; Security</h1><p>You control who sees your information.</p></div></div>
+
+<form method="post" class="card">
+  {% csrf_token %}
+  <div class="field"><span class="label">Who can see my profile?</span>
+    <div class="radio-cards">{% for r in form.profile_visibility %}<label>{{ r.tag }} {{ r.choice_label }}</label>{% endfor %}</div></div>
+  <div class="field"><span class="label">Who can send me messages?</span>
+    <div class="radio-cards">{% for r in form.allow_messages_from %}<label>{{ r.tag }} {{ r.choice_label }}</label>{% endfor %}</div></div>
+  <label class="switch"><span><b>Show my e-mail on my profile</b><span class="subtle" style="display:block">Visible to people who can see your profile</span></span>{{ form.show_email }}</label>
+  <button class="btn btn-primary mt-2" type="submit">Save privacy settings</button>
+</form>
+
+<div class="card settings-list" style="padding:4px 16px">
+  <a href="{% url 'settings_blocked' %}"><span class="ic red"><i class="bi bi-slash-circle"></i></span><span>Blocked users</span><i class="bi bi-chevron-right chev"></i></a>
+  <a href="{% url 'settings_account' %}"><span class="ic"><i class="bi bi-key"></i></span><span>Change password</span><i class="bi bi-chevron-right chev"></i></a>
+  <a href="#" onclick="return false" style="opacity:.6;cursor:default"><span class="ic gray"><i class="bi bi-phone"></i></span><span>Two-factor authentication<span class="sub">Coming soon</span></span></a>
+</div>
+
+<div class="card danger-zone">
+  <h3 style="color:var(--danger)"><i class="bi bi-exclamation-triangle"></i> Danger zone</h3>
+  <p class="muted mt-1 mb-2">Deactivating hides your profile. Deleting removes your account and all your data permanently.</p>
+  <div class="row wrap">
+    <button class="btn btn-outline" data-open="deactivate-modal">Deactivate account</button>
+    <button class="btn btn-danger" data-open="delete-modal">Delete account</button>
+  </div>
+</div>
+
+<dialog class="modal" id="deactivate-modal"><form method="post" action="{% url 'deactivate_account' %}" class="modal-body">{% csrf_token %}
+  <input type="hidden" name="action" value="deactivate">
+  <h2>Deactivate your account?</h2><p class="muted mt-1 mb-2">Your profile will be hidden. Contact support to come back.</p>
+  <div class="field"><label for="pw1">Confirm with your password</label><input id="pw1" type="password" name="password" required></div>
+  <div class="row"><button class="btn btn-outline grow" data-close type="button">Cancel</button><button class="btn btn-primary grow" type="submit">Deactivate</button></div>
+</form></dialog>
+<dialog class="modal" id="delete-modal"><form method="post" action="{% url 'deactivate_account' %}" class="modal-body">{% csrf_token %}
+  <input type="hidden" name="action" value="delete">
+  <h2>Delete your account?</h2><p class="muted mt-1 mb-2">This is permanent: your profile, posts, messages and connections will be deleted.</p>
+  <div class="field"><label for="pw2">Confirm with your password</label><input id="pw2" type="password" name="password" required></div>
+  <div class="row"><button class="btn btn-outline grow" data-close type="button">Cancel</button><button class="btn btn-danger grow" type="submit">Delete forever</button></div>
+</form></dialog>
+{% endblock %}

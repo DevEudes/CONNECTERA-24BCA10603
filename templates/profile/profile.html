@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% load core_tags %}
+{% block title %}{{ profile.full_name }}{% endblock %}
+{% block content %}
+{% if not is_me %}<a href="javascript:history.back()" class="back-link"><i class="bi bi-arrow-left"></i> Back</a>{% endif %}
+
+<section class="card card-flush">
+  <div class="profile-cover">{% if profile.cover %}<img src="{{ profile.cover.url }}" alt="">{% endif %}</div>
+  <div class="profile-head">
+    <div class="avatar-wrap">
+      {% avatar profile 112 online=True %}
+      <div class="profile-actions">
+        {% if is_me %}
+          <a href="{% url 'edit_profile' %}" class="btn btn-primary"><i class="bi bi-pencil"></i> Edit profile</a>
+          <a href="{% url 'settings' %}" class="btn btn-outline btn-icon" aria-label="Settings"><i class="bi bi-gear"></i></a>
+        {% elif i_blocked %}
+          <form method="post" action="{% url 'unblock_user' profile.pk %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}">
+            <button class="btn btn-outline" type="submit"><i class="bi bi-unlock"></i> Unblock</button></form>
+        {% else %}
+          {% if not connection %}
+            <form method="post" action="{% url 'send_request' profile.pk %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}">
+              <button class="btn btn-primary" type="submit"><i class="bi bi-person-plus"></i> Connect</button></form>
+          {% elif connection.status == 'accepted' %}
+            <span class="btn btn-soft"><i class="bi bi-check2"></i> Connected</span>
+          {% elif connection.status == 'pending' and connection.requester == user %}
+            <form method="post" action="{% url 'cancel_request' connection.pk %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}">
+              <button class="btn btn-soft" type="submit" title="Cancel request"><i class="bi bi-hourglass-split"></i> Pending</button></form>
+          {% elif connection.status == 'pending' %}
+            <form method="post" action="{% url 'respond_request' connection.pk 'accept' %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}">
+              <button class="btn btn-primary" type="submit"><i class="bi bi-check2"></i> Accept</button></form>
+            <form method="post" action="{% url 'respond_request' connection.pk 'decline' %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}">
+              <button class="btn btn-outline" type="submit">Decline</button></form>
+          {% else %}
+            <form method="post" action="{% url 'send_request' profile.pk %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}">
+              <button class="btn btn-primary" type="submit"><i class="bi bi-person-plus"></i> Connect</button></form>
+          {% endif %}
+          <a href="{% url 'start_chat' profile.pk %}" class="btn btn-outline"><i class="bi bi-chat-dots"></i> Message</a>
+          <details class="dropdown">
+            <summary class="btn btn-outline btn-icon" aria-label="More"><i class="bi bi-three-dots"></i></summary>
+            <div class="dropdown-menu">
+              {% if connection.status == 'accepted' %}
+              <form method="post" action="{% url 'remove_connection' profile.pk %}" data-confirm="Remove {{ profile.full_name }} from your connections?">{% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.path }}"><button type="submit"><i class="bi bi-person-dash"></i> Remove connection</button></form>
+              {% endif %}
+              <a href="{% url 'report' 'user' profile.pk %}?next={{ request.path|urlencode }}"><i class="bi bi-flag"></i> Report</a>
+              <form method="post" action="{% url 'block_user' profile.pk %}" data-confirm="Block {{ profile.full_name }}? They won't be able to see your profile or message you.">{% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.path }}"><button class="danger" type="submit"><i class="bi bi-slash-circle"></i> Block</button></form>
+            </div>
+          </details>
+        {% endif %}
+      </div>
+    </div>
+
+    <h1>{{ profile.full_name }} </h1>
+    {% if profile.headline %}<p class="muted mt-1">{{ profile.headline }}</p>{% endif %}
+    <div class="profile-meta">
+      {% if profile.university %}<span><i class="bi bi-mortarboard"></i> {{ profile.course }} · {{ profile.university }}</span>{% endif %}
+      {% if profile.year %}<span><i class="bi bi-calendar3"></i> {{ profile.year_label }}</span>{% endif %}
+      {% if profile.country %}<span><i class="bi bi-geo-alt"></i> From {{ profile.country }}</span>{% endif %}
+      {% if profile.destination_country and profile.destination_country != profile.country %}<span><i class="bi bi-airplane"></i> Studying in {{ profile.destination_country }}</span>{% endif %}
+      {% if can_view and profile.show_email or is_me %}<span><i class="bi bi-envelope"></i> {{ profile.email }}</span>{% endif %}
+    </div>
+
+    {% if can_view %}
+    <div class="stats">
+      <a class="stat" href="{% if is_me %}{% url 'connections' %}{% else %}{% url 'connections_of' profile.pk %}{% endif %}"><b>{{ connection_count }}</b><span>Connections</span></a>
+      <div class="stat"><b>{{ post_count }}</b><span>Posts</span></div>
+      <div class="stat"><b>{{ profile.communities.count }}</b><span>Communities</span></div>
+    </div>
+    {% endif %}
+
+    {% if not is_me and mutual_count %}
+    <div class="row mt-2 small muted">
+      <div class="avatar-stack">{% for m in mutual|slice:":3" %}{% avatar m 26 %}{% endfor %}</div>
+      {{ mutual_count }} mutual connection{{ mutual_count|pluralize }}
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+{% if is_me and profile.profile_strength < 100 %}
+<div class="card card-soft mt-3">
+  <div class="row-between mb-1"><b>Profile strength</b><span class="bold text-grad">{{ profile.profile_strength }}%</span></div>
+  <div class="strength"><span style="width:{{ profile.profile_strength }}%"></span></div>
+  <p class="subtle mt-1">Complete profiles get up to 3× more connection requests. <a href="{% url 'edit_profile' %}">Improve it</a></p>
+</div>
+{% endif %}
+
+{% if can_view %}
+  {% if profile.bio %}
+  <div class="card mt-3"><h3 class="mb-1">About</h3><p class="muted" style="white-space:pre-line">{{ profile.bio }}</p></div>
+  {% endif %}
+
+  <div class="card mt-3">
+    <div class="card-title"><h3>Interests</h3>{% if is_me %}<a href="{% url 'select_interests' %}">Edit</a>{% endif %}</div>
+    <div class="chips">
+      {% for i in profile.interests.all %}<span class="chip {% if i.pk|in_set:shared_interests and not is_me %}chip-match{% endif %}">{{ i.icon }} {{ i.name }}</span>{% empty %}<span class="subtle">No interests yet.</span>{% endfor %}
+    </div>
+    {% if shared_interests and not is_me %}<p class="subtle mt-2"><i class="bi bi-stars"></i> You share {{ shared_interests|length }} interest{{ shared_interests|length|pluralize }}</p>{% endif %}
+  </div>
+
+  {% if communities %}
+  <div class="card mt-3">
+    <div class="card-title"><h3>Communities</h3></div>
+    <div class="chips">{% for c in communities %}<a class="chip chip-gray" href="{{ c.get_absolute_url }}">{{ c.icon }} {{ c.name }}</a>{% endfor %}</div>
+  </div>
+  {% endif %}
+
+  <h3 class="mt-4 mb-2">Posts</h3>
+  <div class="feed-list">
+    {% for post in posts %}{% include "feed/_post.html" %}{% empty %}
+    <div class="card empty"><div class="empty-icon"><i class="bi bi-camera"></i></div><h3>No posts yet</h3>
+      <p>{% if is_me %}Share your first moment with your campus!{% else %}{{ profile.first_name_display }} hasn't posted anything yet.{% endif %}</p>
+      {% if is_me %}<a href="{% url 'create_post' %}" class="btn btn-primary">Create a post</a>{% endif %}</div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="card locked mt-3">
+    <i class="bi bi-lock"></i>
+    <h3 class="mt-2">{% if i_blocked %}You blocked this student{% else %}This profile is private{% endif %}</h3>
+    <p class="muted mt-1">{% if i_blocked %}Unblock them to see their profile again.{% else %}Connect with {{ profile.first_name_display }} to see their posts, interests and communities.{% endif %}</p>
+  </div>
+{% endif %}
+{% endblock %}

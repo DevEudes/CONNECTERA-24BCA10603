@@ -1,0 +1,5 @@
+{% load core_tags %}
+<div class="msg {% if m.sender_id == user.pk %}me{% endif %} new">
+  {% if m.sender_id != user.pk %}{% avatar m.sender 30 %}{% endif %}
+  <div><div class="bubble">{{ m.text|urlize }}</div><div class="time">{{ m.created_at|time:"H:i" }}</div></div>
+</div>

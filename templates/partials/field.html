@@ -1,0 +1,8 @@
+<div class="field{% if field.errors %} has-error{% endif %}">
+  {% if not hide_label %}<label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required and not no_star %} <span class="muted">*</span>{% endif %}</label>{% endif %}
+  {% if icon %}
+  <div class="input-icon"><i class="bi bi-{{ icon }}"></i>{{ field }}{% if password %}<button type="button" class="toggle-pwd" aria-label="Show password"><i class="bi bi-eye"></i></button>{% endif %}</div>
+  {% else %}{{ field }}{% endif %}
+  {% if field.help_text and not field.errors %}<span class="help">{{ field.help_text }}</span>{% endif %}
+  {% for e in field.errors %}<p class="error">{{ e }}</p>{% endfor %}
+</div>

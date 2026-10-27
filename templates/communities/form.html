@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Create a community{% endblock %}
+{% block content %}
+<a href="{% url 'communities' %}" class="back-link"><i class="bi bi-arrow-left"></i> Communities</a>
+<div class="page-head"><div><h1>Create a community</h1><p>Bring students together around a passion, a course or a project.</p></div></div>
+<form method="post" enctype="multipart/form-data" class="card" novalidate>
+  {% csrf_token %}
+  <div class="grid-2">
+    {% include "partials/field.html" with field=form.name %}
+    {% include "partials/field.html" with field=form.icon %}
+  </div>
+  {% include "partials/field.html" with field=form.tagline %}
+  {% include "partials/field.html" with field=form.category %}
+  {% include "partials/field.html" with field=form.description %}
+  <div class="field"><span class="label">Cover image</span>
+    <div id="cover-prev" class="post-image hidden mb-1" style="border-radius:16px;overflow:hidden;max-height:200px"></div>
+    <span class="btn btn-soft file-btn" style="align-self:flex-start"><i class="bi bi-image"></i> Choose image<input type="file" name="image" accept="image/*" data-preview="#cover-prev"></span>
+    {% for e in form.image.errors %}<p class="error">{{ e }}</p>{% endfor %}
+  </div>
+  <div class="field"><span class="label">Related interests</span>
+    <div class="chips">{% for cb in form.interests %}<label class="chip chip-gray" style="cursor:pointer">{{ cb.tag }} {{ cb.choice_label }}</label>{% endfor %}</div>
+  </div>
+  <button class="btn btn-primary btn-lg btn-block" type="submit"><i class="bi bi-rocket-takeoff"></i> Create community</button>
+</form>
+{% endblock %}
